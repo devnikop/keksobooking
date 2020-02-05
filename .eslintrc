@@ -1,7 +1,16 @@
-root: true
-
-env:
-  browser: true
-
-extends:
-  "htmlacademy/es5"
+{
+  "root": true,
+  "env": {
+    "browser": true
+  },
+  "extends": [
+    "prettier",
+    "htmlacademy/es5"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error"
+  }
+}
