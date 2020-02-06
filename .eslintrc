@@ -4,8 +4,7 @@
     "browser": true
   },
   "extends": [
-    "prettier",
-    "htmlacademy/es5"
+    "prettier"
   ],
   "plugins": [
     "prettier"
