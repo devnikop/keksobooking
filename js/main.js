@@ -39,7 +39,15 @@ var OfferMock = {
     `http://o0.github.io/assets/images/tokyo/hotel1.jpg`,
     `http://o0.github.io/assets/images/tokyo/hotel2.jpg`,
     `http://o0.github.io/assets/images/tokyo/hotel3.jpg`
-  ]
+  ],
+  CoordX: {
+    MIN: 130,
+    MAX: 630
+  },
+  CoordY: {
+    MIN: 130,
+    MAX: 630
+  }
 };
 
 var getRandomNumber = function({ max }) {
@@ -158,8 +166,25 @@ var getUniqueArray = function({ sourceArray, useAll = false }) {
   return outputArray;
 };
 
+var getCoordinates = function() {
+  var coords = {
+    x: getRandomInt({
+      min: OfferMock.CoordX.MIN,
+      max: OfferMock.CoordX.MAX
+    }),
+    y: getRandomInt({
+      min: OfferMock.CoordY.MIN,
+      max: OfferMock.CoordY.MAX
+    })
+  };
+
+  return coords;
+};
+
 var generateOneOffer = function({ index }) {
   var ordinalIndex = index + 1;
+
+  var coords = getCoordinates();
 
   return {
     author: {
@@ -167,7 +192,7 @@ var generateOneOffer = function({ index }) {
     },
     offer: {
       title: getTitleText({ sourceArray: OfferMock.TITLE_LIST, index }),
-      address: getAddress(),
+      address: `${coords.x}, ${coords.y}`,
       price: getPrice(),
       type: getType(),
       rooms: getRoomCount(),
@@ -179,8 +204,8 @@ var generateOneOffer = function({ index }) {
       photos: getUniqueArray({ sourceArray: OfferMock.PHOTOS, useAll: true })
     },
     location: {
-      x: "",
-      y: ""
+      x: coords.x,
+      y: coords.y
     }
   };
 };
@@ -192,6 +217,11 @@ var generateOffers = function({ count }) {
   return arrayOfObjects;
 };
 
-var offers = generateOffers({ count: OFFER_COUNT });
+var mapContainerElement = document.querySelector(`.map`);
 
+// 1. generate offers
+var offers = generateOffers({ count: OFFER_COUNT });
 console.log(offers);
+// 2. activate map
+mapContainerElement.classList.remove(`map--faded`);
+//
