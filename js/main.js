@@ -2,6 +2,10 @@
 
 var OFFER_COUNT = 8;
 var OfferMock = {
+  Avatar: {
+    WIDTH: 40,
+    HEIGHT: 40
+  },
   TITLE_LIST: [
     `Большая уютная квартира`,
     `Маленькая неуютная квартира`,
@@ -168,14 +172,18 @@ var getUniqueArray = function({ sourceArray, useAll = false }) {
 
 var getCoordinates = function() {
   var coords = {
-    x: getRandomInt({
-      min: OfferMock.CoordX.MIN,
-      max: OfferMock.CoordX.MAX
-    }),
-    y: getRandomInt({
-      min: OfferMock.CoordY.MIN,
-      max: OfferMock.CoordY.MAX
-    })
+    x:
+      getRandomInt({
+        min: OfferMock.CoordX.MIN,
+        max: OfferMock.CoordX.MAX
+      }) -
+      OfferMock.Avatar.WIDTH / 2,
+    y:
+      getRandomInt({
+        min: OfferMock.CoordY.MIN,
+        max: OfferMock.CoordY.MAX
+      }) -
+      OfferMock.Avatar.HEIGHT / 2
   };
 
   return coords;
@@ -218,10 +226,42 @@ var generateOffers = function({ count }) {
 };
 
 var mapContainerElement = document.querySelector(`.map`);
+var mapPinsElements = mapContainerElement.querySelector(`.map__pins`);
+
+var generatePinNode = function({ offer }) {
+  var buttonNode = document.createElement(`button`);
+  buttonNode.classList.add(`map__pin`);
+  buttonNode.type = `button`;
+  buttonNode.style.top = `${offer.location.y}px`;
+  buttonNode.style.left = `${offer.location.x}px`;
+
+  var imgNode = document.createElement(`img`);
+  imgNode.src = offer.author.avatar;
+  imgNode.width = 40;
+  imgNode.height = 40;
+  imgNode.draggable = false;
+  imgNode.alt = offer.offer.title;
+
+  buttonNode.appendChild(imgNode);
+  return buttonNode;
+};
+
+var generatePinNodes = function({ offers }) {
+  var fragment = document.createDocumentFragment();
+
+  for (var i = 0; i < offers.length; i++) {
+    fragment.appendChild(generatePinNode({ offer: offers[i] }));
+  }
+
+  return fragment;
+};
 
 // 1. generate offers
 var offers = generateOffers({ count: OFFER_COUNT });
 console.log(offers);
 // 2. activate map
 mapContainerElement.classList.remove(`map--faded`);
-//
+// 3. generate "#pin" elements
+var pinNodes = generatePinNodes({ offers });
+// 4. append pins in '.map__pins'
+mapPinsElements.appendChild(pinNodes);
