@@ -243,13 +243,15 @@ var generateOffers = function({ count }) {
 };
 
 var generatePinNode = function({ offer }) {
-  var buttonNode = document.createElement(`button`);
-  buttonNode.classList.add(`map__pin`);
+  var buttonNode = createNode({
+    tagName: `button`,
+    classNames: [`map__pin`]
+  });
   buttonNode.type = `button`;
   buttonNode.style.top = `${offer.location.y}px`;
   buttonNode.style.left = `${offer.location.x}px`;
 
-  var imgNode = document.createElement(`img`);
+  var imgNode = createNode({ tagName: `img` });
   imgNode.src = offer.author.avatar;
   imgNode.width = 40;
   imgNode.height = 40;
