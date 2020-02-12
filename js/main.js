@@ -54,6 +54,23 @@ var OfferMock = {
   }
 };
 
+var HousingTypeMap = {
+  flat: `Квартира`,
+  bungalo: `Бунгало`,
+  house: `Дом`,
+  palace: `Дворец`
+};
+
+var createNode = function({ tagName, classNames }) {
+  var node = document.createElement(tagName);
+  if (classNames && classNames.length) {
+    for (var i = 0; i < classNames.length; i++) {
+      node.classList.add(classNames[i]);
+    }
+  }
+  return node;
+};
+
 var getRandomNumber = function({ max }) {
   return Math.ceil(Math.random() * max);
 };
@@ -225,9 +242,6 @@ var generateOffers = function({ count }) {
   return arrayOfObjects;
 };
 
-var mapContainerElement = document.querySelector(`.map`);
-var mapPinsElements = mapContainerElement.querySelector(`.map__pins`);
-
 var generatePinNode = function({ offer }) {
   var buttonNode = document.createElement(`button`);
   buttonNode.classList.add(`map__pin`);
@@ -256,12 +270,151 @@ var generatePinNodes = function({ offers }) {
   return fragment;
 };
 
+var getFeatureNodes = function({ features }) {
+  var fragment = document.createDocumentFragment();
+
+  for (var i = 0; i < features.length; i++) {
+    var popupFeatureNode = createNode({
+      tagName: `li`,
+      classNames: [`popup__feature`, `popup__feature--${features[i]}`]
+    });
+    fragment.appendChild(popupFeatureNode);
+  }
+  return fragment;
+};
+
+var getPopupPhotoNodes = function({ photos }) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < photos.length; i++) {
+    var photo = photos[i];
+    var popupPhotoNode = createNode({
+      tagName: `img`,
+      classNames: [`popup__photo`]
+    });
+    popupPhotoNode.src = photo;
+    popupPhotoNode.alt = `Фотография жилья`;
+    popupPhotoNode.width = 45;
+    popupPhotoNode.height = 40;
+    fragment.appendChild(popupPhotoNode);
+  }
+  return fragment;
+};
+
+var generateCard = function({ data }) {
+  var popupNode = createNode({
+    tagName: `article`,
+    classNames: [`map__card`, `popup`]
+  });
+
+  var popupAvatarNode = createNode({
+    tagName: `img`,
+    classNames: [`popup__avatar`]
+  });
+  popupAvatarNode.src = data.author.avatar;
+  popupAvatarNode.alt = `Аватар пользователя`;
+  popupAvatarNode.width = 70;
+  popupAvatarNode.height = 70;
+
+  var popupCloseNode = createNode({
+    tagName: `button`,
+    classNames: [`popup__close`]
+  });
+  popupCloseNode.type = `button`;
+  popupCloseNode.textContent = `Закрыть`;
+
+  var popupTitleNode = createNode({
+    tagName: `h3`,
+    classNames: [`popup__title`]
+  });
+  popupTitleNode.textContent = data.offer.title;
+
+  var popupAddressNode = createNode({
+    tagName: `p`,
+    classNames: [`popup__text`, `popup__text--address`]
+  });
+  popupAddressNode.textContent = data.offer.address;
+
+  var popupPriceSpanNode = createNode({
+    tagName: `span`
+  });
+  popupPriceSpanNode.textContent = `/ночь`;
+
+  var popupPriceNode = createNode({
+    tagName: `p`,
+    classNames: [`popup__text`, `popup__text--price`]
+  });
+  popupPriceNode.textContent = `${data.offer.price}₽`;
+  popupPriceNode.appendChild(popupPriceSpanNode);
+
+  var popupTypeNode = createNode({
+    tagName: `h4`,
+    classNames: [`popup__type`]
+  });
+  popupTypeNode.textContent = HousingTypeMap[data.offer.type];
+
+  var popupCapacityNode = createNode({
+    tagName: `p`,
+    classNames: [`popup__text`, `popup__text--capacity`]
+  });
+  popupCapacityNode.textContent = `${data.offer.rooms} комнаты для ${data.offer.guests} гостей`;
+
+  var popupTimeNode = createNode({
+    tagName: `p`,
+    classNames: [`popup__text`, `popup__text--time`]
+  });
+  popupTimeNode.textContent = `Заезд после ${data.offer.checkin}, выезд до ${data.offer.checkout}`;
+
+  var popupFeaturesNode = createNode({
+    tagName: `ul`,
+    classNames: [`popup__features`]
+  });
+  popupFeaturesNode.appendChild(
+    getFeatureNodes({ features: data.offer.features })
+  );
+
+  var popupDescriptionNode = createNode({
+    tagName: `p`,
+    classNames: [`popup__description`]
+  });
+  popupDescriptionNode.textContent = data.offer.description;
+
+  var popupPhotosNode = createNode({
+    tagName: `div`,
+    classNames: [`popup__photos`]
+  });
+  popupPhotosNode.appendChild(
+    getPopupPhotoNodes({ photos: data.offer.photos })
+  );
+
+  popupNode.appendChild(popupAvatarNode);
+  popupNode.appendChild(popupCloseNode);
+  popupNode.appendChild(popupTitleNode);
+  popupNode.appendChild(popupAddressNode);
+  popupNode.appendChild(popupPriceNode);
+  popupNode.appendChild(popupTypeNode);
+  popupNode.appendChild(popupCapacityNode);
+  popupNode.appendChild(popupTimeNode);
+  popupNode.appendChild(popupFeaturesNode);
+  popupNode.appendChild(popupDescriptionNode);
+  popupNode.appendChild(popupPhotosNode);
+
+  return popupNode;
+};
+
+var mapContainerElement = document.querySelector(`.map`);
+var mapPinsElements = mapContainerElement.querySelector(`.map__pins`);
+var mapFiltersElement = mapContainerElement.querySelector(
+  `.map__filters-container`
+);
+
 // 1. generate offers
 var offers = generateOffers({ count: OFFER_COUNT });
-console.log(offers);
 // 2. activate map
 mapContainerElement.classList.remove(`map--faded`);
 // 3. generate "#pin" elements
 var pinNodes = generatePinNodes({ offers });
 // 4. append pins in '.map__pins'
 mapPinsElements.appendChild(pinNodes);
+// 5. generate card & append in .map before .map__filters-container
+var cardNode = generateCard({ data: offers[0] });
+mapContainerElement.insertBefore(cardNode, mapFiltersElement);
