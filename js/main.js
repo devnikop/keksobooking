@@ -212,6 +212,7 @@ var generateOneOffer = function({ index }) {
   var coords = getCoordinates();
 
   return {
+    id: index,
     author: {
       avatar: getAvatarSrc({ index: ordinalIndex })
     },
@@ -248,8 +249,14 @@ var generatePinNode = function({ offer }) {
     classNames: [`map__pin`]
   });
   buttonNode.type = `button`;
+  buttonNode.dataset.id = offer.id;
   buttonNode.style.top = `${offer.location.y}px`;
   buttonNode.style.left = `${offer.location.x}px`;
+  buttonNode.addEventListener(`click`, function() {
+    const currentPopup = document.querySelector(`.map__card`);
+    currentPopup.remove();
+    addCardPopup({ data: offers[buttonNode.dataset.id] });
+  });
 
   var imgNode = createNode({ tagName: `img` });
   imgNode.src = offer.author.avatar;
@@ -323,6 +330,9 @@ var generateCard = function({ data }) {
   });
   popupCloseNode.type = `button`;
   popupCloseNode.textContent = `Закрыть`;
+  popupCloseNode.addEventListener(`click`, function() {
+    popupNode.remove();
+  });
 
   var popupTitleNode = createNode({
     tagName: `h3`,
@@ -409,14 +419,75 @@ var mapFiltersElement = mapContainerElement.querySelector(
   `.map__filters-container`
 );
 
+var adFormElement = document.querySelector(`.ad-form`);
+var adFormGroupElements = adFormElement.querySelectorAll(`fieldset`);
+var addressInputElement = adFormElement.querySelector(`#address`);
+
+var mapFilterElement = mapFiltersElement.querySelector(`.map__filters`);
+var mapFilterSelectElements = mapFilterElement.querySelectorAll(`select`);
+var mapFilterFieldsetElement = mapFilterElement.querySelector(`fieldset`);
+
+var activateAllForms = function() {
+  for (var i = 0; i < adFormGroupElements.length; i++) {
+    adFormGroupElements[i].disabled = false;
+  }
+  for (var i = 0; i < mapFilterSelectElements.length; i++) {
+    mapFilterSelectElements[i].disabled = false;
+  }
+  mapFilterFieldsetElement.disabled = false;
+};
+
+var addCardPopup = function({ data }) {
+  var cardNode = generateCard({ data });
+  mapContainerElement.insertBefore(cardNode, mapFiltersElement);
+};
+
+var startProgram = function() {
+  // 2. activate map
+  mapContainerElement.classList.remove(`map--faded`);
+  // 3. generate "#pin" elements
+  var pinNodes = generatePinNodes({ offers });
+  // 4. append pins in '.map__pins'
+  mapPinsElements.appendChild(pinNodes);
+  // 5. generate card & append in .map before .map__filters-container
+  addCardPopup({ data: offers[0] });
+  activateAllForms();
+  adFormElement.classList.remove(`ad-form--disabled`);
+};
+
+var setNodeDisable = function(element) {
+  element.disabled = true;
+};
+
+var setNodeEnable = function(element) {
+  element.disabled = false;
+};
+
+var setAllFormsDisable = function() {
+  // 6. disable form elements
+  for (var i = 0; i < adFormGroupElements.length; i++) {
+    setNodeDisable(adFormGroupElements[i]);
+  }
+  // 7. disable filter
+  for (var i = 0; i < mapFilterSelectElements.length; i++) {
+    setNodeDisable(mapFilterSelectElements[i]);
+  }
+  setNodeDisable(mapFilterFieldsetElement);
+};
+
 // 1. generate offers
 var offers = generateOffers({ count: OFFER_COUNT });
-// 2. activate map
-mapContainerElement.classList.remove(`map--faded`);
-// 3. generate "#pin" elements
-var pinNodes = generatePinNodes({ offers });
-// 4. append pins in '.map__pins'
-mapPinsElements.appendChild(pinNodes);
-// 5. generate card & append in .map before .map__filters-container
-var cardNode = generateCard({ data: offers[0] });
-mapContainerElement.insertBefore(cardNode, mapFiltersElement);
+setAllFormsDisable();
+
+// 8.map-pin--main
+var mapPinMainElement = mapContainerElement.querySelector(`.map__pin--main`);
+mapPinMainElement.addEventListener(
+  `mouseup`,
+  function() {
+    startProgram();
+  },
+  { once: true }
+);
+// 9.fill address
+addressInputElement.value = `${mapContainerElement.offsetWidth /
+  2}, ${mapContainerElement.offsetHeight / 2}`;
