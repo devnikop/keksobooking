@@ -26,14 +26,34 @@
   var startProgram = function() {
     // 2. activate map
     mapContainerElement.classList.remove(`map--faded`);
-    // 3. generate "#pin" elements
-    var pinNodes = window.pin.generatePinNodes({ offers: window.map.offers });
-    // 4. append pins in '.map__pins'
-    mapPinsElements.appendChild(pinNodes);
-    // 5. generate card & append in .map before .map__filters-container
-    window.pin.addCardPopup({ data: window.map.offers[0] });
-    activateAllForms();
-    adFormElement.classList.remove(`ad-form--disabled`);
+
+    var successHandler = function(offers) {
+      offers.forEach((offer, index) => {
+        offer.id = index;
+      });
+      window.map = {
+        offers
+      };
+      // 3. generate "#pin" elements
+      var pinNodes = window.pin.generatePinNodes({ offers });
+      // 4. append pins in '.map__pins'
+      mapPinsElements.appendChild(pinNodes);
+      // 5. generate card & append in .map before .map__filters-container
+      window.pin.addCardPopup({ data: offers[0] });
+      activateAllForms();
+      adFormElement.classList.remove(`ad-form--disabled`);
+    };
+
+    var errorHandler = function(errorMessage) {
+      var errorTemplate = document
+        .querySelector(`#error`)
+        .content.cloneNode(true);
+
+      var main = document.querySelector(`main`);
+      document.body.insertBefore(errorTemplate, main);
+    };
+
+    window.backend.load(successHandler, errorHandler);
   };
 
   var setAllFormsDisable = function() {
@@ -90,6 +110,27 @@
   // 9.fill address
   addressInputElement.value = `${mapContainerElement.offsetWidth /
     2}, ${mapContainerElement.offsetHeight / 2}`;
+
+  adFormElement.addEventListener(`submit`, function(evt) {
+    evt.preventDefault();
+
+    var errorHandler = function(errorMessage) {
+      var errorTemplate = document
+        .querySelector(`#error`)
+        .content.cloneNode(true);
+
+      var main = document.querySelector(`main`);
+      document.body.insertBefore(errorTemplate, main);
+    };
+
+    window.backend.upload(
+      new FormData(adFormElement),
+      function(response) {
+        response;
+      },
+      errorHandler
+    );
+  });
 
   window.form = {
     mapContainerElement,
