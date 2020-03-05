@@ -1,31 +1,92 @@
 (function() {
-  var mapContainerElement = document.querySelector(`.map`);
-  var mapPinsElements = mapContainerElement.querySelector(`.map__pins`);
-  var mapFiltersElement = mapContainerElement.querySelector(
-    `.map__filters-container`
-  );
+  var Element = {
+    map: {
+      BLOCK: `map`,
+      FADED: `map--faded`,
 
-  var adFormElement = document.querySelector(`.ad-form`);
-  var adFormGroupElements = adFormElement.querySelectorAll(`fieldset`);
-  var addressInputElement = adFormElement.querySelector(`#address`);
+      PIN_MAIN: `map__pin--main`,
+      PINS: `map__pins`,
+      FILTERS_CONTAINER: `map__filters-container`,
+      FILTERS_FORM: `map__filters`,
+      FEATURES: `map__features`
+    },
+    adForm: {
+      BLOCK: `ad-form`,
+      DISABLED: `ad-form--disabled`,
 
-  var mapFilterElement = mapFiltersElement.querySelector(`.map__filters`);
-  var mapFilterSelectElements = mapFilterElement.querySelectorAll(`select`);
-  var mapFilterFieldsetElement = mapFilterElement.querySelector(`fieldset`);
+      ADDRESS_INPUT: `address`
+    }
+  };
+
+  var getElement = {
+    get map() {
+      return document.querySelector(`.${Element.map.BLOCK}`);
+    },
+
+    get mapPinMain() {
+      return this.map.querySelector(`.${Element.map.PIN_MAIN}`);
+    },
+
+    get mapPins() {
+      return this.map.querySelector(`.${Element.map.PINS}`);
+    },
+
+    get mapFiltersContainer() {
+      return this.map.querySelector(`.${Element.map.FILTERS_CONTAINER}`);
+    },
+
+    get adForm() {
+      return document.querySelector(`.${Element.adForm.BLOCK}`);
+    },
+
+    get allAdFormGroup() {
+      return this.adForm.querySelectorAll(`fieldset`);
+    },
+
+    get addressInput() {
+      return this.adForm.querySelector(`#${Element.adForm.ADDRESS_INPUT}`);
+    },
+
+    get mapFiltersForm() {
+      return this.mapFiltersContainer.querySelector(
+        `.${Element.map.FILTERS_FORM}`
+      );
+    },
+
+    get allMapFiltersSelect() {
+      return this.mapFiltersForm.querySelectorAll(`select`);
+    },
+
+    get mapFeatures() {
+      return this.mapFiltersForm.querySelector(`.${Element.map.FEATURES}`);
+    }
+  };
+
+  var disableAllForms = function() {
+    getElement.allAdFormGroup.forEach(groupEl =>
+      window.util.setNodeDisable(groupEl)
+    );
+    getElement.allMapFiltersSelect.forEach(filterEl =>
+      window.util.setNodeDisable(filterEl)
+    );
+    window.util.setNodeDisable(getElement.mapFeatures);
+  };
 
   var activateAllForms = function() {
-    for (var i = 0; i < adFormGroupElements.length; i++) {
-      adFormGroupElements[i].disabled = false;
-    }
-    for (var i = 0; i < mapFilterSelectElements.length; i++) {
-      mapFilterSelectElements[i].disabled = false;
-    }
-    mapFilterFieldsetElement.disabled = false;
+    getElement.allAdFormGroup.forEach(groupEl =>
+      window.util.setNodeEnable(groupEl)
+    );
+    getElement.allMapFiltersSelect.forEach(filterEl =>
+      window.util.setNodeEnable(filterEl)
+    );
+    window.util.setNodeEnable(getElement.mapFeatures);
+    getElement.adForm.classList.remove(Element.adForm.DISABLED);
   };
 
   var startProgram = function() {
-    // 2. activate map
-    mapContainerElement.classList.remove(`map--faded`);
+    var activateMap = function() {
+      getElement.map.classList.remove(Element.map.FADED);
+    };
 
     var successHandler = function(offers) {
       offers.forEach((offer, index) => {
@@ -37,11 +98,10 @@
       // 3. generate "#pin" elements
       var pinNodes = window.pin.generatePinNodes({ offers });
       // 4. append pins in '.map__pins'
-      mapPinsElements.appendChild(pinNodes);
+      getElement.mapPins.appendChild(pinNodes);
       // 5. generate card & append in .map before .map__filters-container
       window.pin.addCardPopup({ data: offers[0] });
       activateAllForms();
-      adFormElement.classList.remove(`ad-form--disabled`);
     };
 
     var errorHandler = function(errorMessage) {
@@ -53,65 +113,55 @@
       document.body.insertBefore(errorTemplate, main);
     };
 
+    activateMap();
     window.backend.load(successHandler, errorHandler);
   };
 
-  var setAllFormsDisable = function() {
-    // 6. disable form elements
-    for (var i = 0; i < adFormGroupElements.length; i++) {
-      window.util.setNodeDisable(adFormGroupElements[i]);
-    }
-    // 7. disable filter
-    for (var i = 0; i < mapFilterSelectElements.length; i++) {
-      window.util.setNodeDisable(mapFilterSelectElements[i]);
-    }
-    window.util.setNodeDisable(mapFilterFieldsetElement);
+  // 8.map-pin--main
+  var onMapPinMainMousedownHandler = function(evt) {
+    var currentElement = this;
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var onMapPinMousemoveHandler = function(moveEvt) {
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      currentElement.style.top = currentElement.offsetTop - shift.y + "px";
+      currentElement.style.left = currentElement.offsetLeft - shift.x + "px";
+    };
+
+    var removeMapPinHandlers = function() {
+      document.removeEventListener(`mousemove`, onMapPinMousemoveHandler);
+      document.removeEventListener(`mouseup`, onMapPinMouseupHandler);
+    };
+
+    var onMapPinMouseupHandler = function() {
+      window.form.startProgram();
+      removeMapPinHandlers();
+    };
+
+    document.addEventListener(`mousemove`, onMapPinMousemoveHandler);
+    document.addEventListener(`mouseup`, onMapPinMouseupHandler);
   };
 
-  setAllFormsDisable();
-
-  // 8.map-pin--main
-  var mapPinMainElement = mapContainerElement.querySelector(`.map__pin--main`);
-  mapPinMainElement.addEventListener(
+  getElement.mapPinMain.addEventListener(
     `mousedown`,
-    function(evt) {
-      var startCoords = {
-        x: evt.clientX,
-        y: evt.clientY
-      };
-
-      var onMapPinMousemoveHandler = function(moveEvt) {
-        var shift = {
-          x: startCoords.x - moveEvt.clientX,
-          y: startCoords.y - moveEvt.clientY
-        };
-
-        mapPinMainElement.style.top =
-          mapPinMainElement.offsetTop - shift.y + "px";
-        mapPinMainElement.style.left =
-          mapPinMainElement.offsetLeft - shift.x + "px";
-      };
-
-      var removeMapPinHandlers = function() {
-        document.removeEventListener(`mousemove`, onMapPinMousemoveHandler);
-        document.removeEventListener(`mouseup`, onMapPinMouseupHandler);
-      };
-
-      var onMapPinMouseupHandler = function() {
-        window.form.startProgram();
-        removeMapPinHandlers();
-      };
-
-      document.addEventListener(`mousemove`, onMapPinMousemoveHandler);
-      document.addEventListener(`mouseup`, onMapPinMouseupHandler);
-    },
-    { once: true }
+    onMapPinMainMousedownHandler,
+    {
+      once: true
+    }
   );
   // 9.fill address
-  addressInputElement.value = `${mapContainerElement.offsetWidth /
-    2}, ${mapContainerElement.offsetHeight / 2}`;
+  getElement.addressInput.value = `${getElement.map.offsetWidth /
+    2}, ${getElement.map.offsetHeight / 2}`;
 
-  adFormElement.addEventListener(`submit`, function(evt) {
+  getElement.adForm.addEventListener(`submit`, function(evt) {
     evt.preventDefault();
 
     var errorHandler = function(errorMessage) {
@@ -124,7 +174,7 @@
     };
 
     window.backend.upload(
-      new FormData(adFormElement),
+      new FormData(getElement.adForm),
       function(response) {
         response;
       },
@@ -132,9 +182,11 @@
     );
   });
 
+  disableAllForms();
+
   window.form = {
-    mapContainerElement,
-    mapFiltersElement,
+    mapContainerElement: getElement.map,
+    mapFiltersElement: getElement.mapFiltersContainer,
     startProgram
   };
 })();

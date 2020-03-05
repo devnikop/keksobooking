@@ -86,15 +86,16 @@
     element.disabled = true;
   };
 
-  // var setNodeEnable = function(element) {
-  //   element.disabled = false;
-  // };
+  var setNodeEnable = function(element) {
+    element.disabled = false;
+  };
 
   window.util = {
     getRandomInt,
     getRandomItemFromArray,
     getUniqueArray,
     createNode,
-    setNodeDisable
+    setNodeDisable,
+    setNodeEnable
   };
 })();
