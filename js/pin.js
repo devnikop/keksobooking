@@ -7,6 +7,16 @@
     );
   };
 
+  var onPinButtonClick = function() {
+    var currentElement = this;
+
+    const currentPopup = document.querySelector(`.map__card`);
+    if (currentPopup) {
+      currentPopup.remove();
+    }
+    addCardPopup({ data: window.map.offers[currentElement.dataset.id] });
+  };
+
   var generatePinNode = function({ offer }) {
     var buttonNode = window.util.createNode({
       tagName: `button`,
@@ -16,13 +26,9 @@
     buttonNode.dataset.id = offer.id;
     buttonNode.style.top = `${offer.location.y}px`;
     buttonNode.style.left = `${offer.location.x}px`;
-    buttonNode.addEventListener(`click`, function() {
-      const currentPopup = document.querySelector(`.map__card`);
-      if (currentPopup) {
-        currentPopup.remove();
-      }
-      addCardPopup({ data: window.map.offers[buttonNode.dataset.id] });
-    });
+
+    var onPinButtonClickBound = onPinButtonClick.bind(buttonNode);
+    buttonNode.addEventListener(`click`, onPinButtonClickBound);
 
     var imgNode = window.util.createNode({ tagName: `img` });
     imgNode.src = offer.author.avatar;
