@@ -124,33 +124,29 @@
     }
   };
 
-  var onFilterFormChange = function() {
-    var typeElement = getElement.housingType;
-    var priceElement = getElement.housingPrice;
-    var roomsElement = getElement.housingRooms;
-    var guestsElement = getElement.housingQuests;
+  var filterElement = {
+    type: getElement.housingType,
+    price: getElement.housingPrice,
+    rooms: getElement.housingRooms,
+    guests: getElement.housingQuests
+  };
 
+  var FilterMap = {
+    type: filter.byType,
+    price: filter.byPrice,
+    rooms: filter.byRooms,
+    guests: filter.byGuests
+  };
+
+  var onFilterFormChange = function() {
     var initialOffers = window.map.offers;
     var filteredOffers = initialOffers.slice();
 
-    filteredOffers = filter.byType({
-      initialOffers: filteredOffers,
-      filterValue: typeElement.value
-    });
-
-    filteredOffers = filter.byPrice({
-      initialOffers: filteredOffers,
-      filterValue: priceElement.value
-    });
-
-    filteredOffers = filter.byRooms({
-      initialOffers: filteredOffers,
-      filterValue: roomsElement.value
-    });
-
-    filteredOffers = filter.byGuests({
-      initialOffers: filteredOffers,
-      filterValue: guestsElement.value
+    Object.keys(FilterMap).forEach(function(item) {
+      filteredOffers = FilterMap[item]({
+        initialOffers: filteredOffers,
+        filterValue: filterElement[item].value
+      });
     });
 
     window.pin.addNewPins({ offers: filteredOffers });
