@@ -160,5 +160,6 @@
     window.pin.addNewPins({ offers: filteredOffers });
   };
 
-  getElement.mapFiltersForm.addEventListener(`change`, onFilterFormChange);
+  var onChangeDebounced = window.debounce(onFilterFormChange);
+  getElement.mapFiltersForm.addEventListener(`change`, onChangeDebounced);
 })();
