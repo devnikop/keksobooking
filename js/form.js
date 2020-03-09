@@ -5,7 +5,6 @@
       FADED: `map--faded`,
 
       PIN_MAIN: `map__pin--main`,
-      PINS: `map__pins`,
       FILTERS_CONTAINER: `map__filters-container`,
       FILTERS_FORM: `map__filters`,
       FEATURES: `map__features`
@@ -25,10 +24,6 @@
 
     get mapPinMain() {
       return this.map.querySelector(`.${Element.map.PIN_MAIN}`);
-    },
-
-    get mapPins() {
-      return this.map.querySelector(`.${Element.map.PINS}`);
     },
 
     get mapFiltersContainer() {
@@ -92,15 +87,8 @@
       offers.forEach((offer, index) => {
         offer.id = index;
       });
-      window.map = {
-        offers
-      };
-      // 3. generate "#pin" elements
-      var pinNodes = window.pin.generatePinNodes({ offers });
-      // 4. append pins in '.map__pins'
-      getElement.mapPins.appendChild(pinNodes);
-      // 5. generate card & append in .map before .map__filters-container
-      window.pin.addCardPopup({ data: offers[0] });
+      window.map = { offers };
+      window.pin.addNewPins({ offers });
       activateAllForms();
     };
 

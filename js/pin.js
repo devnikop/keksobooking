@@ -1,4 +1,29 @@
 (function() {
+  var Element = {
+    map: {
+      BLOCK: `map`,
+
+      PINS: `map__pins`,
+      CURRENT_PIN: `map__pin:not(.map__pin--main)`
+    }
+  };
+
+  var getElement = {
+    get map() {
+      return document.querySelector(`.${Element.map.BLOCK}`);
+    },
+
+    get mapPins() {
+      return this.map.querySelector(`.${Element.map.PINS}`);
+    },
+
+    get currentPins() {
+      return this.mapPins.querySelectorAll(`.${Element.map.CURRENT_PIN}`);
+    }
+  };
+
+  var PINS_MAX_COUNT = 5;
+
   var addCardPopup = function({ data }) {
     var cardNode = window.card.generateCard({ data });
     window.form.mapContainerElement.insertBefore(
@@ -7,13 +32,17 @@
     );
   };
 
-  var onPinButtonClick = function() {
-    var currentElement = this;
-
+  var removeCurrentCardPopup = function() {
     const currentPopup = document.querySelector(`.map__card`);
     if (currentPopup) {
       currentPopup.remove();
     }
+  };
+
+  var onPinButtonClick = function() {
+    var currentElement = this;
+
+    removeCurrentCardPopup();
     addCardPopup({ data: window.map.offers[currentElement.dataset.id] });
   };
 
@@ -44,14 +73,29 @@
   var generatePinNodes = function({ offers }) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < offers.length; i++) {
+    var pinsCount =
+      offers.length < PINS_MAX_COUNT ? offers.length : PINS_MAX_COUNT;
+    for (var i = 0; i < pinsCount; i++) {
       fragment.appendChild(generatePinNode({ offer: offers[i] }));
     }
 
     return fragment;
   };
 
+  var addNewPins = function({ offers }) {
+    window.util.removeElements({ elements: getElement.currentPins });
+    if (!offers.length) {
+      console.log(`empty filteredOffers`);
+      return;
+    }
+    var pinNodes = generatePinNodes({ offers });
+    getElement.mapPins.appendChild(pinNodes);
+    removeCurrentCardPopup();
+    window.pin.addCardPopup({ data: offers[0] });
+  };
+
   window.pin = {
+    addNewPins,
     addCardPopup,
     generatePinNodes
   };

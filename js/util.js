@@ -90,12 +90,19 @@
     element.disabled = false;
   };
 
+  var removeElements = function({ elements }) {
+    elements.forEach(element => {
+      element.remove();
+    });
+  };
+
   window.util = {
     getRandomInt,
     getRandomItemFromArray,
     getUniqueArray,
     createNode,
     setNodeDisable,
-    setNodeEnable
+    setNodeEnable,
+    removeElements
   };
 })();
