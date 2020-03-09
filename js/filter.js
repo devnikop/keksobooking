@@ -10,7 +10,7 @@
       HOUSING_PRICE: `housing-price`,
       HOUSING_ROOMS: `housing-rooms`,
       HOUSING_QUESTS: `housing-guests`,
-      HOUSING_FEATURES: `housing-features`
+      MAP_CHECKBOX: `map__checkbox`
     }
   };
 
@@ -45,9 +45,9 @@
       );
     },
 
-    get housingFeatures() {
-      return this.mapFiltersForm.querySelector(
-        `#${Element.map.HOUSING_FEATURES}`
+    get mapCheckboxes() {
+      return this.mapFiltersForm.querySelectorAll(
+        `.${Element.map.MAP_CHECKBOX}`
       );
     }
   };
@@ -147,6 +147,14 @@
         initialOffers: filteredOffers,
         filterValue: filterElement[item].value
       });
+    });
+
+    getElement.mapCheckboxes.forEach(checkbox => {
+      checkbox.checked
+        ? (filteredOffers = filteredOffers.filter(offer =>
+            offer.offer.features.includes(checkbox.value)
+          ))
+        : ``;
     });
 
     window.pin.addNewPins({ offers: filteredOffers });
