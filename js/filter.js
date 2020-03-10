@@ -1,54 +1,50 @@
 (function() {
-  var Element = {
-    map: {
-      BLOCK: `map`,
-
-      FILTERS_FORM: `map__filters`,
-      PINS: `map__pins`,
-
-      HOUSING_TYPE: `housing-type`,
-      HOUSING_PRICE: `housing-price`,
-      HOUSING_ROOMS: `housing-rooms`,
-      HOUSING_QUESTS: `housing-guests`,
-      MAP_CHECKBOX: `map__checkbox`
-    }
-  };
+  var Classname = {};
 
   var getElement = {
+    Selector: {
+      MAP: `.map`,
+      MAP_FILTERS_FORM: `.map__filters`,
+
+      MAP_PINS: `.map__pins`,
+
+      HOUSING_TYPE: `#housing-type`,
+      HOUSING_PRICE: `#housing-price`,
+      HOUSING_ROOMS: `#housing-rooms`,
+      HOUSING_QUESTS: `#housing-guests`,
+      MAP_CHECKBOX: `.map__checkbox`
+    },
+
     get map() {
-      return document.querySelector(`.${Element.map.BLOCK}`);
+      return document.querySelector(this.Selector.MAP);
     },
 
     get mapPins() {
-      return this.map.querySelector(`.${Element.map.PINS}`);
+      return this.map.querySelector(this.Selector.MAP_PINS);
     },
 
     get mapFiltersForm() {
-      return this.map.querySelector(`.${Element.map.FILTERS_FORM}`);
+      return this.map.querySelector(this.Selector.MAP_FILTERS_FORM);
     },
 
     get housingType() {
-      return this.mapFiltersForm.querySelector(`#${Element.map.HOUSING_TYPE}`);
+      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_TYPE);
     },
 
     get housingPrice() {
-      return this.mapFiltersForm.querySelector(`#${Element.map.HOUSING_PRICE}`);
+      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_PRICE);
     },
 
     get housingRooms() {
-      return this.mapFiltersForm.querySelector(`#${Element.map.HOUSING_ROOMS}`);
+      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_ROOMS);
     },
 
     get housingQuests() {
-      return this.mapFiltersForm.querySelector(
-        `#${Element.map.HOUSING_QUESTS}`
-      );
+      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_QUESTS);
     },
 
     get mapCheckboxes() {
-      return this.mapFiltersForm.querySelectorAll(
-        `.${Element.map.MAP_CHECKBOX}`
-      );
+      return this.mapFiltersForm.querySelectorAll(this.Selector.MAP_CHECKBOX);
     }
   };
 
