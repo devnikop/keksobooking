@@ -1,45 +1,33 @@
 (function () {
-  var FILE_TYPES = ["gif", "jpg", "jpeg", "png"];
+  const IMAGE_EXTN = [`gif`, `jpg`, `jpeg`, `png`];
 
-  var getElement = {
-    Selector: {
-      AD_FORM_HEADER: `.ad-form-header`,
-      FORM_FILE_PREVIEW: `.ad-form-header__preview img`,
-      FORM_INPUT_FILE: `.ad-form__field input`,
-    },
-
-    get adFormHeader() {
-      return document.querySelector(this.Selector.AD_FORM_HEADER);
-    },
-
-    get filePreview() {
-      return this.adFormHeader.querySelector(this.Selector.FORM_FILE_PREVIEW);
-    },
-
-    get formInputFile() {
-      return this.adFormHeader.querySelector(this.Selector.FORM_INPUT_FILE);
-    },
+  const Selector = {
+    AD_FORM_HEADER: `.ad-form-header`,
+    FORM_FILE_PREVIEW: `.ad-form-header__preview img`,
+    FORM_INPUT_FILE: `.ad-form__field input`,
   };
 
-  var fileChooser = getElement.formInputFile;
-  var preview = getElement.filePreview;
+  const isFileExtMatch = (extensionList, fileName) =>
+    extensionList.some((it) => fileName.endsWith(it));
 
-  fileChooser.addEventListener(`change`, function () {
-    var file = fileChooser.files[0];
-    var fileName = file.name.toLowerCase();
+  const $wrapper = document.querySelector(Selector.AD_FORM_HEADER);
+  const $inputFile = $wrapper.querySelector(Selector.FORM_INPUT_FILE);
+  const $preview = $wrapper.querySelector(Selector.FORM_FILE_PREVIEW);
 
-    var matches = FILE_TYPES.some(function (it) {
-      return fileName.endsWith(it);
-    });
+  const handlerInputFileChange = () => {
+    const file = $inputFile.files[0];
+    const fileName = file.name.toLowerCase();
 
-    if (matches) {
-      var reader = new FileReader();
+    if (isFileExtMatch(IMAGE_EXTN, fileName)) {
+      const reader = new FileReader();
 
-      reader.addEventListener("load", function () {
-        preview.src = reader.result;
+      reader.addEventListener(`load`, () => {
+        $preview.src = reader.result;
       });
 
       reader.readAsDataURL(file);
     }
-  });
+  };
+
+  $inputFile.addEventListener(`change`, handlerInputFileChange);
 })();

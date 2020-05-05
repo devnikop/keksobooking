@@ -1,54 +1,28 @@
 (function () {
-  var Classname = {};
+  const Selector = {
+    MAP: `.map`,
+    MAP_FILTERS_FORM: `.map__filters`,
 
-  var getElement = {
-    Selector: {
-      MAP: `.map`,
-      MAP_FILTERS_FORM: `.map__filters`,
+    MAP_PINS: `.map__pins`,
 
-      MAP_PINS: `.map__pins`,
-
-      HOUSING_TYPE: `#housing-type`,
-      HOUSING_PRICE: `#housing-price`,
-      HOUSING_ROOMS: `#housing-rooms`,
-      HOUSING_QUESTS: `#housing-guests`,
-      MAP_CHECKBOX: `.map__checkbox`,
-    },
-
-    get map() {
-      return document.querySelector(this.Selector.MAP);
-    },
-
-    get mapPins() {
-      return this.map.querySelector(this.Selector.MAP_PINS);
-    },
-
-    get mapFiltersForm() {
-      return this.map.querySelector(this.Selector.MAP_FILTERS_FORM);
-    },
-
-    get housingType() {
-      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_TYPE);
-    },
-
-    get housingPrice() {
-      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_PRICE);
-    },
-
-    get housingRooms() {
-      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_ROOMS);
-    },
-
-    get housingQuests() {
-      return this.mapFiltersForm.querySelector(this.Selector.HOUSING_QUESTS);
-    },
-
-    get mapCheckboxes() {
-      return this.mapFiltersForm.querySelectorAll(this.Selector.MAP_CHECKBOX);
-    },
+    HOUSING_TYPE: `#housing-type`,
+    HOUSING_PRICE: `#housing-price`,
+    HOUSING_ROOMS: `#housing-rooms`,
+    HOUSING_QUESTS: `#housing-guests`,
+    MAP_CHECKBOX: `.map__checkbox`,
   };
 
-  var filter = {
+  const $wrapper = document.querySelector(Selector.MAP);
+
+  const $mapFiltersForm = $wrapper.querySelector(Selector.MAP_FILTERS_FORM);
+
+  const $housingPrice = $mapFiltersForm.querySelector(Selector.HOUSING_PRICE);
+  const $housingQuests = $mapFiltersForm.querySelector(Selector.HOUSING_QUESTS);
+  const $housingRooms = $mapFiltersForm.querySelector(Selector.HOUSING_ROOMS);
+  const $housingType = $mapFiltersForm.querySelector(Selector.HOUSING_TYPE);
+  const $mapCheckboxes = $mapFiltersForm.querySelectorAll(Selector.MAP_CHECKBOX);
+
+  const filter = {
     TypeMap: {
       flat: `flat`,
       bungalo: `bungalo`,
@@ -58,10 +32,10 @@
     },
 
     PriceMap: {
-      low: { min: 0, max: 9999 },
-      middle: { min: 10000, max: 49999 },
-      high: { min: 50000, max: Infinity },
-      any: { min: -Infinity, max: Infinity },
+      low: {min: 0, max: 9999},
+      middle: {min: 10000, max: 49999},
+      high: {min: 50000, max: Infinity},
+      any: {min: -Infinity, max: Infinity},
     },
 
     RoomsMap: {
@@ -78,8 +52,8 @@
       any: `any`,
     },
 
-    byType: function ({ initialOffers, filterValue }) {
-      return initialOffers.filter(function (offer) {
+    byType({initialOffers, filterValue}) {
+      return initialOffers.filter((offer) => {
         if (filterValue === filter.TypeMap.any) {
           return true;
         }
@@ -88,19 +62,20 @@
       });
     },
 
-    byPrice: function ({ initialOffers, filterValue }) {
-      var priceRange = filter.PriceMap[filterValue];
+    byPrice({initialOffers, filterValue}) {
+      const priceRange = filter.PriceMap[filterValue];
 
-      return initialOffers.filter(function (offer) {
-        var price = offer.offer.price;
+      return initialOffers.filter((offer) => {
+        const price = offer.offer.price;
         if (price >= priceRange.min && price <= priceRange.max) {
           return true;
         }
+        return null;
       });
     },
 
-    byRooms: function ({ initialOffers, filterValue }) {
-      return initialOffers.filter(function (offer) {
+    byRooms({initialOffers, filterValue}) {
+      return initialOffers.filter((offer) => {
         if (filterValue === filter.RoomsMap.any) {
           return true;
         }
@@ -109,8 +84,8 @@
       });
     },
 
-    byGuests: function ({ initialOffers, filterValue }) {
-      return initialOffers.filter(function (offer) {
+    byGuests({initialOffers, filterValue}) {
+      return initialOffers.filter((offer) => {
         if (filterValue === filter.GuestsMap.any) {
           return true;
         }
@@ -120,42 +95,40 @@
     },
   };
 
-  var filterElement = {
-    type: getElement.housingType,
-    price: getElement.housingPrice,
-    rooms: getElement.housingRooms,
-    guests: getElement.housingQuests,
+  const filterElement = {
+    type: $housingType,
+    price: $housingPrice,
+    rooms: $housingRooms,
+    guests: $housingQuests,
   };
 
-  var FilterMap = {
+  const FilterMap = {
     type: filter.byType,
     price: filter.byPrice,
     rooms: filter.byRooms,
     guests: filter.byGuests,
   };
 
-  var onFilterFormChange = function () {
-    var initialOffers = window.map.offers;
-    var filteredOffers = initialOffers.slice();
+  const handleFormChange = () => {
+    const initialOffers = window.map.offers;
+    let filteredOffers = initialOffers.slice();
 
-    Object.keys(FilterMap).forEach(function (item) {
+    Object.keys(FilterMap).forEach((item) => {
       filteredOffers = FilterMap[item]({
         initialOffers: filteredOffers,
         filterValue: filterElement[item].value,
       });
     });
 
-    getElement.mapCheckboxes.forEach((checkbox) => {
-      checkbox.checked
-        ? (filteredOffers = filteredOffers.filter((offer) =>
-          offer.offer.features.includes(checkbox.value)
-        ))
-        : ``;
-    });
+    $mapCheckboxes.forEach((checkbox) =>
+      checkbox.checked &&
+      (filteredOffers = filteredOffers.filter((offer) =>
+        offer.offer.features.includes(checkbox.value)
+      ))
+    );
 
-    window.pin.addNewPins({ offers: filteredOffers });
+    window.pin.addNewPins({offers: filteredOffers});
   };
 
-  var onChangeDebounced = window.debounce(onFilterFormChange);
-  getElement.mapFiltersForm.addEventListener(`change`, onChangeDebounced);
+  $mapFiltersForm.addEventListener(`change`, window.debounce(handleFormChange));
 })();

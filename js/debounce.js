@@ -1,16 +1,15 @@
 (function () {
-  var DEBOUNCE_INTERVAL = 300;
+  const DEBOUNCE_INTERVAL = 300;
 
-  debounce = function (cb) {
-    var lastTimeout = null;
+  const debounce = (cb) => {
+    let lastTimeout = null;
 
-    return function () {
-      var parameters = arguments;
+    return (...parameters) => {
       if (lastTimeout) {
         window.clearTimeout(lastTimeout);
       }
-      lastTimeout = window.setTimeout(function () {
-        cb.apply(null, parameters);
+      lastTimeout = window.setTimeout(() => {
+        cb(...parameters);
       }, DEBOUNCE_INTERVAL);
     };
   };

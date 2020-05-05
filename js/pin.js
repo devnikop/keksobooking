@@ -1,102 +1,89 @@
 (function () {
-  var Element = {
-    map: {
-      BLOCK: `map`,
+  const PINS_MAX_COUNT = 5;
 
-      PINS: `map__pins`,
-      CURRENT_PIN: `map__pin:not(.map__pin--main)`,
-    },
+  const Classname = {
+    MAP_PIN: `map__pin`
   };
 
-  var getElement = {
-    get map() {
-      return document.querySelector(`.${Element.map.BLOCK}`);
-    },
-
-    get mapPins() {
-      return this.map.querySelector(`.${Element.map.PINS}`);
-    },
-
-    get currentPins() {
-      return this.mapPins.querySelectorAll(`.${Element.map.CURRENT_PIN}`);
-    },
+  const Selector = {
+    MAP: `.map`,
+    MAP_PINS: `.map__pins`,
+    MAP_PINS_CURRENT: `.map__pin:not(.map__pin--main)`
   };
 
-  var PINS_MAX_COUNT = 5;
+  const $wrapper = document.querySelector(Selector.MAP);
+  const $mapPins = $wrapper.querySelector(Selector.MAP_PINS);
 
-  var addCardPopup = function ({ data }) {
-    var cardNode = window.card.generateCard({ data });
+  const addCardPopup = ({data}) => {
+    const cardNode = window.card.generateCard({data});
     window.form.mapContainerElement.insertBefore(
-      cardNode,
-      window.form.mapFiltersElement
+        cardNode,
+        window.form.mapFiltersElement
     );
   };
 
-  var removeCurrentCardPopup = function () {
+  const removeCurrentCardPopup = () => {
     const currentPopup = document.querySelector(`.map__card`);
     if (currentPopup) {
       currentPopup.remove();
     }
   };
 
-  var onPinButtonClick = function () {
-    var currentElement = this;
+  const handlerPinClick = (evt) => {
+    const currentElement = evt.currentTarget;
 
     removeCurrentCardPopup();
-    addCardPopup({ data: window.map.offers[currentElement.dataset.id] });
+    addCardPopup({data: window.map.offers[currentElement.dataset.id]});
   };
 
-  var generatePinNode = function ({ offer }) {
-    var buttonNode = window.util.createNode({
+  const generatePinNode = ({offer}) => {
+    const buttonNode = window.util.createNode({
       tagName: `button`,
-      classNames: [`map__pin`],
+      classNames: [Classname.MAP_PIN],
     });
     buttonNode.type = `button`;
     buttonNode.dataset.id = offer.id;
     buttonNode.style.top = `${offer.location.y}px`;
     buttonNode.style.left = `${offer.location.x}px`;
 
-    var onPinButtonClickBound = onPinButtonClick.bind(buttonNode);
-    buttonNode.addEventListener(`click`, onPinButtonClickBound);
-
-    var imgNode = window.util.createNode({ tagName: `img` });
+    const imgNode = window.util.createNode({tagName: `img`});
     imgNode.src = offer.author.avatar;
     imgNode.width = 40;
     imgNode.height = 40;
-    imgNode.draggable = false;
     imgNode.alt = offer.offer.title;
 
     buttonNode.appendChild(imgNode);
+    buttonNode.addEventListener(`click`, handlerPinClick);
     return buttonNode;
   };
 
-  var generatePinNodes = function ({ offers }) {
-    var fragment = document.createDocumentFragment();
+  const generatePinNodes = ({offers}) => {
+    const fragment = document.createDocumentFragment();
 
-    var pinsCount =
+    const pinsCount =
       offers.length < PINS_MAX_COUNT ? offers.length : PINS_MAX_COUNT;
-    for (var i = 0; i < pinsCount; i++) {
-      fragment.appendChild(generatePinNode({ offer: offers[i] }));
+    for (let i = 0; i < pinsCount; i++) {
+      fragment.appendChild(generatePinNode({offer: offers[i]}));
     }
 
     return fragment;
   };
 
-  var addNewPins = function ({ offers }) {
-    window.util.removeElements({ elements: getElement.currentPins });
+  const addNewPins = ({offers}) => {
+    const currentPins = $mapPins.querySelectorAll(Selector.MAP_PINS_CURRENT);
+    window.util.removeElements({elements: currentPins});
     if (!offers.length) {
+      // eslint-disable-next-line no-console
       console.log(`empty filteredOffers`);
       return;
     }
-    var pinNodes = generatePinNodes({ offers });
-    getElement.mapPins.appendChild(pinNodes);
+    const pinNodes = generatePinNodes({offers});
+    $mapPins.appendChild(pinNodes);
     removeCurrentCardPopup();
-    window.pin.addCardPopup({ data: offers[0] });
+    addCardPopup({data: offers[0]});
   };
 
   window.pin = {
     addNewPins,
-    addCardPopup,
-    generatePinNodes,
   };
 })();

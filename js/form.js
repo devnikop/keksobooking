@@ -1,5 +1,5 @@
 (function () {
-  var Element = {
+  const Element = {
     map: {
       BLOCK: `map`,
       FADED: `map--faded`,
@@ -17,7 +17,7 @@
     },
   };
 
-  var getElement = {
+  const getElement = {
     get map() {
       return document.querySelector(`.${Element.map.BLOCK}`);
     },
@@ -44,7 +44,7 @@
 
     get mapFiltersForm() {
       return this.mapFiltersContainer.querySelector(
-        `.${Element.map.FILTERS_FORM}`
+          `.${Element.map.FILTERS_FORM}`
       );
     },
 
@@ -57,7 +57,7 @@
     },
   };
 
-  var disableAllForms = function () {
+  const disableAllForms = () => {
     getElement.allAdFormGroup.forEach((groupEl) =>
       window.util.setNodeDisable(groupEl)
     );
@@ -67,7 +67,7 @@
     window.util.setNodeDisable(getElement.mapFeatures);
   };
 
-  var activateAllForms = function () {
+  const activateAllForms = () => {
     getElement.allAdFormGroup.forEach((groupEl) =>
       window.util.setNodeEnable(groupEl)
     );
@@ -78,26 +78,26 @@
     getElement.adForm.classList.remove(Element.adForm.DISABLED);
   };
 
-  var startProgram = function () {
-    var activateMap = function () {
+  const startProgram = () => {
+    const activateMap = () => {
       getElement.map.classList.remove(Element.map.FADED);
     };
 
-    var successHandler = function (offers) {
+    const successHandler = (offers) => {
       offers.forEach((offer, index) => {
         offer.id = index;
       });
-      window.map = { offers };
-      window.pin.addNewPins({ offers });
+      window.map = {offers};
+      window.pin.addNewPins({offers});
       activateAllForms();
     };
 
-    var errorHandler = function (errorMessage) {
-      var errorTemplate = document
+    const errorHandler = (errorMessage) => {
+      const errorTemplate = document
         .querySelector(`#error`)
         .content.cloneNode(true);
 
-      var main = document.querySelector(`main`);
+      const main = document.querySelector(`main`);
       document.body.insertBefore(errorTemplate, main);
     };
 
@@ -106,30 +106,30 @@
   };
 
   // 8.map-pin--main
-  var onMapPinMainMousedownHandler = function (evt) {
-    var currentElement = this;
+  const handlerPinMousedown = (evt) => {
+    const currentElement = evt.target;
 
-    var startCoords = {
+    const startCoords = {
       x: evt.clientX,
       y: evt.clientY,
     };
 
-    var onMapPinMousemoveHandler = function (moveEvt) {
-      var shift = {
+    const onMapPinMousemoveHandler = (moveEvt) => {
+      const shift = {
         x: startCoords.x - moveEvt.clientX,
         y: startCoords.y - moveEvt.clientY,
       };
 
-      currentElement.style.top = currentElement.offsetTop - shift.y + "px";
-      currentElement.style.left = currentElement.offsetLeft - shift.x + "px";
+      currentElement.style.top = currentElement.offsetTop - shift.y + `px`;
+      currentElement.style.left = currentElement.offsetLeft - shift.x + `px`;
     };
 
-    var removeMapPinHandlers = function () {
+    const removeMapPinHandlers = () => {
       document.removeEventListener(`mousemove`, onMapPinMousemoveHandler);
       document.removeEventListener(`mouseup`, onMapPinMouseupHandler);
     };
 
-    var onMapPinMouseupHandler = function () {
+    const onMapPinMouseupHandler = () => {
       window.form.startProgram();
       removeMapPinHandlers();
     };
@@ -139,35 +139,35 @@
   };
 
   getElement.mapPinMain.addEventListener(
-    `mousedown`,
-    onMapPinMainMousedownHandler,
-    {
-      once: true,
-    }
+      `mousedown`,
+      handlerPinMousedown,
+      {
+        once: true,
+      }
   );
   // 9.fill address
   getElement.addressInput.value = `${getElement.map.offsetWidth / 2}, ${
     getElement.map.offsetHeight / 2
   }`;
 
-  getElement.adForm.addEventListener(`submit`, function (evt) {
+  getElement.adForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
 
-    var errorHandler = function (errorMessage) {
-      var errorTemplate = document
+    const errorHandler = (errorMessage) => {
+      const errorTemplate = document
         .querySelector(`#error`)
         .content.cloneNode(true);
 
-      var main = document.querySelector(`main`);
+      const main = document.querySelector(`main`);
       document.body.insertBefore(errorTemplate, main);
     };
 
     window.backend.upload(
-      new FormData(getElement.adForm),
-      function (response) {
-        response;
-      },
-      errorHandler
+        new FormData(getElement.adForm),
+        (response) => {
+          response;
+        },
+        errorHandler
     );
   });
 

@@ -1,141 +1,157 @@
 (function () {
-  var HousingTypeMap = {
+  const Classname = {
+    MAP_CARD: `map__card`,
+
+    POPUP_AVATAR: `popup__avatar`,
+    POPUP_CLOSE: `popup__close`,
+    POPUP_DESCRIPTION: `popup__description`,
+    POPUP_FEATURE: `popup__feature`,
+    POPUP_FEATURES: `popup__features`,
+    POPUP_PHOTO: `popup__photo`,
+    POPUP_PHOTOS: `popup__photos`,
+    POPUP_TEXT_ADDRESS: `popup__text--address`,
+    POPUP_TEXT_CAPACITY: `popup__text--capacity`,
+    POPUP_TEXT_PRICE: `popup__text--price`,
+    POPUP_TEXT_TIME: `popup__text--time`,
+    POPUP_TEXT: `popup__text`,
+    POPUP_TITLE: `popup__title`,
+    POPUP_TYPE: `popup__type`,
+    POPUP: `popup`,
+  };
+
+  const HousingTypeMap = {
     flat: `Квартира`,
     bungalo: `Бунгало`,
     house: `Дом`,
     palace: `Дворец`,
   };
 
-  var getFeatureNodes = function ({ features }) {
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < features.length; i++) {
-      var popupFeatureNode = window.util.createNode({
+  const getFeatureNodes = ({features}) =>
+    features.reduce((acc, feature) => {
+      const popupFeatureNode = window.util.createNode({
         tagName: `li`,
-        classNames: [`popup__feature`, `popup__feature--${features[i]}`],
+        classNames: [
+          Classname.POPUP_FEATURE,
+          `${Classname.POPUP_FEATURE}--${feature}`
+        ],
       });
-      fragment.appendChild(popupFeatureNode);
-    }
-    return fragment;
-  };
+      acc.append(popupFeatureNode);
+      return acc;
+    }, document.createDocumentFragment());
 
-  var getPopupPhotoNodes = function ({ photos }) {
-    var fragment = document.createDocumentFragment();
-    for (var i = 0; i < photos.length; i++) {
-      var photo = photos[i];
-      var popupPhotoNode = window.util.createNode({
+  const getPopupPhotoNodes = ({photos}) =>
+    photos.reduce((acc, photo) => {
+      const popupPhotoNode = window.util.createNode({
         tagName: `img`,
-        classNames: [`popup__photo`],
+        classNames: [Classname.POPUP_PHOTO],
       });
       popupPhotoNode.src = photo;
       popupPhotoNode.alt = `Фотография жилья`;
       popupPhotoNode.width = 45;
       popupPhotoNode.height = 40;
-      fragment.appendChild(popupPhotoNode);
-    }
-    return fragment;
-  };
 
-  var generateCard = function ({ data }) {
-    var popupNode = window.util.createNode({
+      acc.append(popupPhotoNode);
+      return acc;
+    }, document.createDocumentFragment());
+
+  const generateCard = ({data}) => {
+    const popupNode = window.util.createNode({
       tagName: `article`,
-      classNames: [`map__card`, `popup`],
+      classNames: [Classname.MAP_CARD, Classname.POPUP],
     });
 
-    var popupAvatarNode = window.util.createNode({
+    const popupAvatarNode = window.util.createNode({
       tagName: `img`,
-      classNames: [`popup__avatar`],
+      classNames: [Classname.POPUP_AVATAR],
     });
     popupAvatarNode.src = data.author.avatar;
     popupAvatarNode.alt = `Аватар пользователя`;
     popupAvatarNode.width = 70;
     popupAvatarNode.height = 70;
 
-    var popupCloseNode = window.util.createNode({
+    const popupCloseNode = window.util.createNode({
       tagName: `button`,
-      classNames: [`popup__close`],
+      classNames: [Classname.POPUP_CLOSE],
     });
     popupCloseNode.type = `button`;
     popupCloseNode.textContent = `Закрыть`;
-    popupCloseNode.addEventListener(`click`, function () {
-      popupNode.remove();
-    });
+    popupCloseNode.addEventListener(`click`, () => popupNode.remove());
 
-    var popupTitleNode = window.util.createNode({
+    const popupTitleNode = window.util.createNode({
       tagName: `h3`,
-      classNames: [`popup__title`],
+      classNames: [Classname.POPUP_TITLE],
     });
     popupTitleNode.textContent = data.offer.title;
 
-    var popupAddressNode = window.util.createNode({
+    const popupAddressNode = window.util.createNode({
       tagName: `p`,
-      classNames: [`popup__text`, `popup__text--address`],
+      classNames: [Classname.POPUP_TEXT, Classname.POPUP_TEXT_ADDRESS],
     });
     popupAddressNode.textContent = data.offer.address;
 
-    var popupPriceSpanNode = window.util.createNode({
+    const popupPriceSpanNode = window.util.createNode({
       tagName: `span`,
     });
     popupPriceSpanNode.textContent = `/ночь`;
 
-    var popupPriceNode = window.util.createNode({
+    const popupPriceNode = window.util.createNode({
       tagName: `p`,
-      classNames: [`popup__text`, `popup__text--price`],
+      classNames: [Classname.POPUP_TEXT, Classname.POPUP_TEXT_PRICE],
     });
     popupPriceNode.textContent = `${data.offer.price}₽`;
-    popupPriceNode.appendChild(popupPriceSpanNode);
+    popupPriceNode.append(popupPriceSpanNode);
 
-    var popupTypeNode = window.util.createNode({
+    const popupTypeNode = window.util.createNode({
       tagName: `h4`,
-      classNames: [`popup__type`],
+      classNames: [Classname.POPUP_TYPE],
     });
     popupTypeNode.textContent = HousingTypeMap[data.offer.type];
 
-    var popupCapacityNode = window.util.createNode({
+    const popupCapacityNode = window.util.createNode({
       tagName: `p`,
-      classNames: [`popup__text`, `popup__text--capacity`],
+      classNames: [Classname.POPUP_TEXT, Classname.POPUP_TEXT_CAPACITY],
     });
     popupCapacityNode.textContent = `${data.offer.rooms} комнаты для ${data.offer.guests} гостей`;
 
-    var popupTimeNode = window.util.createNode({
+    const popupTimeNode = window.util.createNode({
       tagName: `p`,
-      classNames: [`popup__text`, `popup__text--time`],
+      classNames: [Classname.POPUP_TEXT, Classname.POPUP_TEXT_TIME],
     });
     popupTimeNode.textContent = `Заезд после ${data.offer.checkin}, выезд до ${data.offer.checkout}`;
 
-    var popupFeaturesNode = window.util.createNode({
+    const popupFeaturesNode = window.util.createNode({
       tagName: `ul`,
-      classNames: [`popup__features`],
+      classNames: [Classname.POPUP_FEATURES],
     });
-    popupFeaturesNode.appendChild(
-      getFeatureNodes({ features: data.offer.features })
+    popupFeaturesNode.append(
+        getFeatureNodes({features: data.offer.features})
     );
 
-    var popupDescriptionNode = window.util.createNode({
+    const popupDescriptionNode = window.util.createNode({
       tagName: `p`,
-      classNames: [`popup__description`],
+      classNames: [Classname.POPUP_DESCRIPTION],
     });
     popupDescriptionNode.textContent = data.offer.description;
 
-    var popupPhotosNode = window.util.createNode({
+    const popupPhotosNode = window.util.createNode({
       tagName: `div`,
-      classNames: [`popup__photos`],
+      classNames: [Classname.POPUP_PHOTOS],
     });
-    popupPhotosNode.appendChild(
-      getPopupPhotoNodes({ photos: data.offer.photos })
+    popupPhotosNode.append(
+        getPopupPhotoNodes({photos: data.offer.photos})
     );
 
-    popupNode.appendChild(popupAvatarNode);
-    popupNode.appendChild(popupCloseNode);
-    popupNode.appendChild(popupTitleNode);
-    popupNode.appendChild(popupAddressNode);
-    popupNode.appendChild(popupPriceNode);
-    popupNode.appendChild(popupTypeNode);
-    popupNode.appendChild(popupCapacityNode);
-    popupNode.appendChild(popupTimeNode);
-    popupNode.appendChild(popupFeaturesNode);
-    popupNode.appendChild(popupDescriptionNode);
-    popupNode.appendChild(popupPhotosNode);
+    popupNode.append(popupAvatarNode);
+    popupNode.append(popupCloseNode);
+    popupNode.append(popupTitleNode);
+    popupNode.append(popupAddressNode);
+    popupNode.append(popupPriceNode);
+    popupNode.append(popupTypeNode);
+    popupNode.append(popupCapacityNode);
+    popupNode.append(popupTimeNode);
+    popupNode.append(popupFeaturesNode);
+    popupNode.append(popupDescriptionNode);
+    popupNode.append(popupPhotosNode);
 
     return popupNode;
   };
