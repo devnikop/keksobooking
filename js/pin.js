@@ -1,5 +1,5 @@
 (function () {
-  const PINS_MAX_COUNT = 5;
+  const PINS_COUNT_MAX = 5;
 
   const Classname = {
     MAP_PIN: `map__pin`
@@ -52,21 +52,21 @@
     imgNode.height = 40;
     imgNode.alt = offer.offer.title;
 
-    buttonNode.appendChild(imgNode);
+    buttonNode.append(imgNode);
     buttonNode.addEventListener(`click`, handlerPinClick);
     return buttonNode;
   };
 
+  const getPinCount = ({offers}) =>
+    offers.length < PINS_COUNT_MAX ? offers.length : PINS_COUNT_MAX;
+
   const generatePinNodes = ({offers}) => {
-    const fragment = document.createDocumentFragment();
-
-    const pinsCount =
-      offers.length < PINS_MAX_COUNT ? offers.length : PINS_MAX_COUNT;
-    for (let i = 0; i < pinsCount; i++) {
-      fragment.appendChild(generatePinNode({offer: offers[i]}));
-    }
-
-    return fragment;
+    const pinsCount = getPinCount({offers});
+    const offerList = offers.slice(0, pinsCount);
+    return offerList.reduce((acc, offer) => {
+      acc.append(generatePinNode({offer}));
+      return acc;
+    }, document.createDocumentFragment());
   };
 
   const addNewPins = ({offers}) => {
@@ -78,7 +78,7 @@
       return;
     }
     const pinNodes = generatePinNodes({offers});
-    $mapPins.appendChild(pinNodes);
+    $mapPins.append(pinNodes);
     removeCurrentCardPopup();
     addCardPopup({data: offers[0]});
   };
