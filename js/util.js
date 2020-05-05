@@ -1,14 +1,14 @@
-(function() {
-  var getRandomNumber = function({ max }) {
+(function () {
+  var getRandomNumber = function ({ max }) {
     return Math.ceil(Math.random() * max);
   };
 
-  var getRandomItemFromArray = function({ sourceArray }) {
+  var getRandomItemFromArray = function ({ sourceArray }) {
     var randomIndex = getRandomNumber({ max: sourceArray.length }) - 1;
     return sourceArray[randomIndex];
   };
 
-  var findInArray = function({ item, checkArray }) {
+  var findInArray = function ({ item, checkArray }) {
     for (var j = 0; j < checkArray.length; j++) {
       if (checkArray[j] === item) {
         return true;
@@ -17,17 +17,17 @@
     return false;
   };
 
-  var getRandomInt = function({ min, max }) {
+  var getRandomInt = function ({ min, max }) {
     min = Math.ceil(min);
     max = Math.floor(max);
     var maxInclusive = max + 1;
     return Math.floor(Math.random() * (maxInclusive - min) + min);
   };
 
-  var getShuffledArray = function({
+  var getShuffledArray = function ({
     outputArrayLength,
     sourceArrayLength,
-    sourceArray
+    sourceArray,
   }) {
     var outputArray = [];
 
@@ -38,7 +38,7 @@
 
       var isAlreadyExist = findInArray({
         item: sourceItem,
-        checkArray: outputArray
+        checkArray: outputArray,
       });
 
       if (isAlreadyExist) {
@@ -53,7 +53,7 @@
     return outputArray;
   };
 
-  var getUniqueArray = function({ sourceArray, useAll = false }) {
+  var getUniqueArray = function ({ sourceArray, useAll = false }) {
     var sourceArrayLength = sourceArray.length;
     var outputArrayLength = 0;
 
@@ -66,13 +66,13 @@
     var outputArray = getShuffledArray({
       outputArrayLength,
       sourceArrayLength,
-      sourceArray
+      sourceArray,
     });
 
     return outputArray;
   };
 
-  var createNode = function({ tagName, classNames }) {
+  var createNode = function ({ tagName, classNames }) {
     var node = document.createElement(tagName);
     if (classNames && classNames.length) {
       for (var i = 0; i < classNames.length; i++) {
@@ -82,16 +82,16 @@
     return node;
   };
 
-  var setNodeDisable = function(element) {
+  var setNodeDisable = function (element) {
     element.disabled = true;
   };
 
-  var setNodeEnable = function(element) {
+  var setNodeEnable = function (element) {
     element.disabled = false;
   };
 
-  var removeElements = function({ elements }) {
-    elements.forEach(element => {
+  var removeElements = function ({ elements }) {
+    elements.forEach((element) => {
       element.remove();
     });
   };
@@ -103,6 +103,6 @@
     createNode,
     setNodeDisable,
     setNodeEnable,
-    removeElements
+    removeElements,
   };
 })();

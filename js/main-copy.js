@@ -8,7 +8,7 @@ var OFFER_TITLES = [
   "Квартира для семьи из трех человек",
   "Комната с отдельной ванной",
   "Комната с балконом и видом на парк",
-  "Дворец для пары без детей"
+  "Дворец для пары без детей",
 ];
 var OFFER_TYPES = ["palace", "flat", "house", "bungalo"];
 var OFFER_CHECKINS = ["12:00", "13:00", "14:00"];
@@ -19,17 +19,17 @@ var OFFER_FEATURES = [
   "parking",
   "washer",
   "elevator",
-  "conditioner"
+  "conditioner",
 ];
 var OFFER_DESCRIPTIONS = [
   "A comfortable space that can accommodate up to 2 people. This apartment is 3mins from Shinjuku by train and also close to Shibuya ! It is a 6-minute walk from the nearest station of the apartment.The apartment is in a residential area so you can sleep peacefully and sleep at night.",
   "We have permission for business as hotel, Japan visitors can legally stay* >3 metro stations nearby take you directly to the best Tokyo spots >Bus to Tokyo airports (Tokyo City Air Terminal) is a short walk distance >Neighborhood has traditional shops, pubs, restaurants for true local experience >Grocery&drug stores, ¥100 shops nearby to fill your shopping needs >Ideal for short stay, but we have had many satisfied long-term guests >Checkin until 12am, convenient in case of arrival by late flight",
-  "Tateishi Tokyo,Quaint Neighborhood around the Station. Many Bars still exist since right after the World War near the station. You can feel what Tokyo was like back in 1940s. Good access to Major spot (15mins-50mins )"
+  "Tateishi Tokyo,Quaint Neighborhood around the Station. Many Bars still exist since right after the World War near the station. You can feel what Tokyo was like back in 1940s. Good access to Major spot (15mins-50mins )",
 ];
 var OFFER_PHOTOS = [
   "http://o0.github.io/assets/images/tokyo/hotel1.jpg",
   "http://o0.github.io/assets/images/tokyo/hotel2.jpg",
-  "http://o0.github.io/assets/images/tokyo/hotel3.jpg"
+  "http://o0.github.io/assets/images/tokyo/hotel3.jpg",
 ];
 var OFFERS_NUMBER = 8;
 var PIN_WIDTH = 50;
@@ -41,7 +41,7 @@ var PIN_HEIGHT = 70;
  * @param {number} max - Maximum number from a range of numbers.
  * @return {number} A random integer between min (included) and max (included).
  */
-var getRandomInteger = function(min, max) {
+var getRandomInteger = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
@@ -50,7 +50,7 @@ var getRandomInteger = function(min, max) {
  * @param {Array} array, from which you want to get a random item.
  * @return {*} - random array item
  */
-var getRandomElemenFromArray = function(array) {
+var getRandomElemenFromArray = function (array) {
   return array[getRandomInteger(0, array.length - 1)];
 };
 
@@ -59,7 +59,7 @@ var getRandomElemenFromArray = function(array) {
  * @param {number} index - Index of the offer.
  * @return {string} URL address of avatar image
  */
-var generateAvatarUrl = function(index) {
+var generateAvatarUrl = function (index) {
   return "img/avatars/user0" + (index + 1) + ".png";
 };
 
@@ -67,10 +67,10 @@ var generateAvatarUrl = function(index) {
  * @description Function returns an object with x an y coordinates to place the pin on map.
  * @return {object} Object represents location with coordinates of an offer.
  */
-var generateLocation = function() {
+var generateLocation = function () {
   return {
     x: getRandomInteger(130, 630),
-    y: getRandomInteger(130, 630)
+    y: getRandomInteger(130, 630),
   };
 };
 
@@ -79,7 +79,7 @@ var generateLocation = function() {
  * @param {array} dictionary - Array of strings.
  * @return {array} New array of strings of various length from 1 string to the same number of string as the length of the dictionary.
  */
-var generateArrayOfStrings = function(dictionary) {
+var generateArrayOfStrings = function (dictionary) {
   var resultArrayLength = getRandomInteger(1, dictionary.length);
   var resultArray = [];
 
@@ -95,12 +95,12 @@ var generateArrayOfStrings = function(dictionary) {
  * @param {number} index of an offer.
  * @return {object} One offer.
  */
-var generateOneOffer = function(index) {
+var generateOneOffer = function (index) {
   var location = generateLocation();
 
   return {
     author: {
-      avatar: generateAvatarUrl(index)
+      avatar: generateAvatarUrl(index),
     },
     offer: {
       title: getRandomElemenFromArray(OFFER_TITLES),
@@ -113,13 +113,13 @@ var generateOneOffer = function(index) {
       checkout: getRandomElemenFromArray(OFFER_CHECKOUTS),
       features: generateArrayOfStrings(OFFER_FEATURES),
       description: getRandomElemenFromArray(OFFER_DESCRIPTIONS),
-      photos: generateArrayOfStrings(OFFER_PHOTOS)
+      photos: generateArrayOfStrings(OFFER_PHOTOS),
     },
 
     location: {
       x: location.x,
-      y: location.y
-    }
+      y: location.y,
+    },
   };
 };
 
@@ -128,7 +128,7 @@ var generateOneOffer = function(index) {
  * @param {number} number - Quantity of offers to generate.
  * @return {array} An array of offer objects.
  */
-var generateOffers = function(number) {
+var generateOffers = function (number) {
   var offers = [];
   for (var i = 0; i < number; i++) {
     offers[i] = generateOneOffer(i);
@@ -143,7 +143,7 @@ var generateOffers = function(number) {
  * @param {object} mapPin - HTML element object that will contain a pin.
  * @return {object} HTML element of one map pin.
  */
-var renderOneMapPin = function(offer, mapPin) {
+var renderOneMapPin = function (offer, mapPin) {
   var mapPinElement = mapPin.cloneNode(true);
 
   mapPinElement.style.left = offer.location.x - PIN_WIDTH / 2 + "px";
@@ -158,7 +158,7 @@ var renderOneMapPin = function(offer, mapPin) {
  * @description Function renders all map pins in the HTML block with a class 'map__pins'.
  * @param {array} offers - An array of offer objects;
  */
-var renderAllMapPins = function(offers) {
+var renderAllMapPins = function (offers) {
   var mapPin = document
     .querySelector("#pin")
     .content.querySelector(".map__pin");
@@ -175,7 +175,7 @@ var renderAllMapPins = function(offers) {
 /**
  * @description Function removes fade effect from the map.
  */
-var showMap = function() {
+var showMap = function () {
   document.querySelector(".map").classList.remove("map--faded");
 };
 
@@ -184,7 +184,7 @@ var showMap = function() {
  * @param {object} offer - An object with offer data.
  * @return {string} - a Russian word for the offer type.
  */
-var getOfferType = function(offer) {
+var getOfferType = function (offer) {
   switch (offer.offer.type) {
     case "flat":
       return "Квартира";
@@ -204,7 +204,7 @@ var getOfferType = function(offer) {
  * @param {object} offer - Offer object.
  * @return {string} Offer data with rooms and guests number.
  */
-var getRoomsAndGuests = function(offer) {
+var getRoomsAndGuests = function (offer) {
   var roomsAndGuests = "";
   if (offer.offer.rooms && offer.offer.guests) {
     roomsAndGuests =
@@ -218,7 +218,7 @@ var getRoomsAndGuests = function(offer) {
  * @param {object} offer - Offer object.
  * @return {string} Offer data with checkin and checkout time.
  */
-var getCheckinAndCheckoutTime = function(offer) {
+var getCheckinAndCheckoutTime = function (offer) {
   var checkinAndCheckout = "";
   if (offer.offer.checkin && offer.offer.checkout) {
     checkinAndCheckout =
@@ -235,7 +235,7 @@ var getCheckinAndCheckoutTime = function(offer) {
  * @param {object} element - HTML block with text content.
  * @param {string} elementText Text from the offer that should be in the element's textContent.
  */
-var hideEmptyTextElement = function(element, elementText) {
+var hideEmptyTextElement = function (element, elementText) {
   if (elementText) {
     element.textContent = elementText;
   } else {
@@ -249,7 +249,7 @@ var hideEmptyTextElement = function(element, elementText) {
  * @param {object} cardTemplate - HTML object with a template markup.
  * @return {object} HTML object with one map card.
  */
-var renderOneMapCard = function(offer, cardTemplate) {
+var renderOneMapCard = function (offer, cardTemplate) {
   var mapCardElement = cardTemplate.cloneNode(true);
   var mapCardTitle = mapCardElement.querySelector(".popup__title");
   var mapCardAddress = mapCardElement.querySelector(".popup__text--address");

@@ -1,11 +1,11 @@
-(function() {
+(function () {
   var Element = {
     map: {
       BLOCK: `map`,
 
       PINS: `map__pins`,
-      CURRENT_PIN: `map__pin:not(.map__pin--main)`
-    }
+      CURRENT_PIN: `map__pin:not(.map__pin--main)`,
+    },
   };
 
   var getElement = {
@@ -19,12 +19,12 @@
 
     get currentPins() {
       return this.mapPins.querySelectorAll(`.${Element.map.CURRENT_PIN}`);
-    }
+    },
   };
 
   var PINS_MAX_COUNT = 5;
 
-  var addCardPopup = function({ data }) {
+  var addCardPopup = function ({ data }) {
     var cardNode = window.card.generateCard({ data });
     window.form.mapContainerElement.insertBefore(
       cardNode,
@@ -32,24 +32,24 @@
     );
   };
 
-  var removeCurrentCardPopup = function() {
+  var removeCurrentCardPopup = function () {
     const currentPopup = document.querySelector(`.map__card`);
     if (currentPopup) {
       currentPopup.remove();
     }
   };
 
-  var onPinButtonClick = function() {
+  var onPinButtonClick = function () {
     var currentElement = this;
 
     removeCurrentCardPopup();
     addCardPopup({ data: window.map.offers[currentElement.dataset.id] });
   };
 
-  var generatePinNode = function({ offer }) {
+  var generatePinNode = function ({ offer }) {
     var buttonNode = window.util.createNode({
       tagName: `button`,
-      classNames: [`map__pin`]
+      classNames: [`map__pin`],
     });
     buttonNode.type = `button`;
     buttonNode.dataset.id = offer.id;
@@ -70,7 +70,7 @@
     return buttonNode;
   };
 
-  var generatePinNodes = function({ offers }) {
+  var generatePinNodes = function ({ offers }) {
     var fragment = document.createDocumentFragment();
 
     var pinsCount =
@@ -82,7 +82,7 @@
     return fragment;
   };
 
-  var addNewPins = function({ offers }) {
+  var addNewPins = function ({ offers }) {
     window.util.removeElements({ elements: getElement.currentPins });
     if (!offers.length) {
       console.log(`empty filteredOffers`);
@@ -97,6 +97,6 @@
   window.pin = {
     addNewPins,
     addCardPopup,
-    generatePinNodes
+    generatePinNodes,
   };
 })();

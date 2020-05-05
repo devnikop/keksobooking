@@ -1,4 +1,4 @@
-(function() {
+(function () {
   var Element = {
     map: {
       BLOCK: `map`,
@@ -7,14 +7,14 @@
       PIN_MAIN: `map__pin--main`,
       FILTERS_CONTAINER: `map__filters-container`,
       FILTERS_FORM: `map__filters`,
-      FEATURES: `map__features`
+      FEATURES: `map__features`,
     },
     adForm: {
       BLOCK: `ad-form`,
       DISABLED: `ad-form--disabled`,
 
-      ADDRESS_INPUT: `address`
-    }
+      ADDRESS_INPUT: `address`,
+    },
   };
 
   var getElement = {
@@ -54,36 +54,36 @@
 
     get mapFeatures() {
       return this.mapFiltersForm.querySelector(`.${Element.map.FEATURES}`);
-    }
+    },
   };
 
-  var disableAllForms = function() {
-    getElement.allAdFormGroup.forEach(groupEl =>
+  var disableAllForms = function () {
+    getElement.allAdFormGroup.forEach((groupEl) =>
       window.util.setNodeDisable(groupEl)
     );
-    getElement.allMapFiltersSelect.forEach(filterEl =>
+    getElement.allMapFiltersSelect.forEach((filterEl) =>
       window.util.setNodeDisable(filterEl)
     );
     window.util.setNodeDisable(getElement.mapFeatures);
   };
 
-  var activateAllForms = function() {
-    getElement.allAdFormGroup.forEach(groupEl =>
+  var activateAllForms = function () {
+    getElement.allAdFormGroup.forEach((groupEl) =>
       window.util.setNodeEnable(groupEl)
     );
-    getElement.allMapFiltersSelect.forEach(filterEl =>
+    getElement.allMapFiltersSelect.forEach((filterEl) =>
       window.util.setNodeEnable(filterEl)
     );
     window.util.setNodeEnable(getElement.mapFeatures);
     getElement.adForm.classList.remove(Element.adForm.DISABLED);
   };
 
-  var startProgram = function() {
-    var activateMap = function() {
+  var startProgram = function () {
+    var activateMap = function () {
       getElement.map.classList.remove(Element.map.FADED);
     };
 
-    var successHandler = function(offers) {
+    var successHandler = function (offers) {
       offers.forEach((offer, index) => {
         offer.id = index;
       });
@@ -92,7 +92,7 @@
       activateAllForms();
     };
 
-    var errorHandler = function(errorMessage) {
+    var errorHandler = function (errorMessage) {
       var errorTemplate = document
         .querySelector(`#error`)
         .content.cloneNode(true);
@@ -106,30 +106,30 @@
   };
 
   // 8.map-pin--main
-  var onMapPinMainMousedownHandler = function(evt) {
+  var onMapPinMainMousedownHandler = function (evt) {
     var currentElement = this;
 
     var startCoords = {
       x: evt.clientX,
-      y: evt.clientY
+      y: evt.clientY,
     };
 
-    var onMapPinMousemoveHandler = function(moveEvt) {
+    var onMapPinMousemoveHandler = function (moveEvt) {
       var shift = {
         x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
+        y: startCoords.y - moveEvt.clientY,
       };
 
       currentElement.style.top = currentElement.offsetTop - shift.y + "px";
       currentElement.style.left = currentElement.offsetLeft - shift.x + "px";
     };
 
-    var removeMapPinHandlers = function() {
+    var removeMapPinHandlers = function () {
       document.removeEventListener(`mousemove`, onMapPinMousemoveHandler);
       document.removeEventListener(`mouseup`, onMapPinMouseupHandler);
     };
 
-    var onMapPinMouseupHandler = function() {
+    var onMapPinMouseupHandler = function () {
       window.form.startProgram();
       removeMapPinHandlers();
     };
@@ -142,17 +142,18 @@
     `mousedown`,
     onMapPinMainMousedownHandler,
     {
-      once: true
+      once: true,
     }
   );
   // 9.fill address
-  getElement.addressInput.value = `${getElement.map.offsetWidth /
-    2}, ${getElement.map.offsetHeight / 2}`;
+  getElement.addressInput.value = `${getElement.map.offsetWidth / 2}, ${
+    getElement.map.offsetHeight / 2
+  }`;
 
-  getElement.adForm.addEventListener(`submit`, function(evt) {
+  getElement.adForm.addEventListener(`submit`, function (evt) {
     evt.preventDefault();
 
-    var errorHandler = function(errorMessage) {
+    var errorHandler = function (errorMessage) {
       var errorTemplate = document
         .querySelector(`#error`)
         .content.cloneNode(true);
@@ -163,7 +164,7 @@
 
     window.backend.upload(
       new FormData(getElement.adForm),
-      function(response) {
+      function (response) {
         response;
       },
       errorHandler
@@ -175,6 +176,6 @@
   window.form = {
     mapContainerElement: getElement.map,
     mapFiltersElement: getElement.mapFiltersContainer,
-    startProgram
+    startProgram,
   };
 })();
