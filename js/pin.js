@@ -8,17 +8,19 @@
   const Selector = {
     MAP: `.map`,
     MAP_PINS: `.map__pins`,
-    MAP_PINS_CURRENT: `.map__pin:not(.map__pin--main)`
+    MAP_PINS_CURRENT: `.map__pin:not(.map__pin--main)`,
+    MAP_FILTERS_CONTAINER: `.map__filters-container`,
   };
 
-  const $wrapper = document.querySelector(Selector.MAP);
-  const $mapPins = $wrapper.querySelector(Selector.MAP_PINS);
+  const $map = document.querySelector(Selector.MAP);
+  const $mapPins = $map.querySelector(Selector.MAP_PINS);
+  const $mapFiltersContainer = $map.querySelector(Selector.MAP_FILTERS_CONTAINER);
 
   const addCardPopup = ({data}) => {
     const cardNode = window.card.generateCard({data});
-    window.form.mapContainerElement.insertBefore(
+    $map.insertBefore(
         cardNode,
-        window.form.mapFiltersElement
+        $mapFiltersContainer
     );
   };
 

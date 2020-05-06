@@ -1,108 +1,76 @@
 (function () {
-  const Element = {
-    map: {
-      BLOCK: `map`,
-      FADED: `map--faded`,
-
-      PIN_MAIN: `map__pin--main`,
-      FILTERS_CONTAINER: `map__filters-container`,
-      FILTERS_FORM: `map__filters`,
-      FEATURES: `map__features`,
-    },
-    adForm: {
-      BLOCK: `ad-form`,
-      DISABLED: `ad-form--disabled`,
-
-      ADDRESS_INPUT: `address`,
-    },
+  const Import = {
+    addNewPins: window.pin.addNewPins,
+    load: window.backend.load,
+    setNodeDisable: window.util.setNodeDisable,
+    setNodeEnable: window.util.setNodeEnable,
+    upload: window.backend.upload,
   };
 
-  const getElement = {
-    get map() {
-      return document.querySelector(`.${Element.map.BLOCK}`);
-    },
-
-    get mapPinMain() {
-      return this.map.querySelector(`.${Element.map.PIN_MAIN}`);
-    },
-
-    get mapFiltersContainer() {
-      return this.map.querySelector(`.${Element.map.FILTERS_CONTAINER}`);
-    },
-
-    get adForm() {
-      return document.querySelector(`.${Element.adForm.BLOCK}`);
-    },
-
-    get allAdFormGroup() {
-      return this.adForm.querySelectorAll(`fieldset`);
-    },
-
-    get addressInput() {
-      return this.adForm.querySelector(`#${Element.adForm.ADDRESS_INPUT}`);
-    },
-
-    get mapFiltersForm() {
-      return this.mapFiltersContainer.querySelector(
-          `.${Element.map.FILTERS_FORM}`
-      );
-    },
-
-    get allMapFiltersSelect() {
-      return this.mapFiltersForm.querySelectorAll(`select`);
-    },
-
-    get mapFeatures() {
-      return this.mapFiltersForm.querySelector(`.${Element.map.FEATURES}`);
-    },
+  const Classname = {
+    AD_FORM_DISABLED: `ad-form--disabled`,
+    MAP_FADED: `map--faded`,
   };
+
+  const Selector = {
+    AD_FORM_ADDRESS_INPUT: `#address`,
+    AD_FORM: `.ad-form`,
+    FIELDSET: `fieldset`,
+    MAP_FEATURES: `.map__features`,
+    MAP_FILTERS_FORM: `.map__filters`,
+    MAP_PIN_MAIN: `.map__pin--main`,
+    MAP: `.map`,
+    SELECT: `select`,
+    MAIN: `main`,
+    ERROR: `#error`
+  };
+
+  // #region DOM nodes
+  const $adForm = document.querySelector(Selector.AD_FORM);
+  const $map = document.querySelector(Selector.MAP);
+  const $main = document.querySelector(Selector.MAIN);
+  const $errorTemplate = document.querySelector(Selector.ERROR);
+
+  const $adFormAddressInput = $adForm.querySelector(Selector.AD_FORM_ADDRESS_INPUT);
+  const $adFormGroups = $adForm.querySelectorAll(Selector.FIELDSET);
+  const $mapFiltersForm = $map.querySelector(Selector.MAP_FILTERS_FORM);
+  const $mapPinMain = $map.querySelector(Selector.MAP_PIN_MAIN);
+
+  const $mapFeatures = $mapFiltersForm.querySelector(Selector.MAP_FEATURES);
+  const $mapFiltersSelects = $mapFiltersForm.querySelectorAll(Selector.SELECT);
+  // #endregion
 
   const disableAllForms = () => {
-    getElement.allAdFormGroup.forEach((groupEl) =>
-      window.util.setNodeDisable(groupEl)
-    );
-    getElement.allMapFiltersSelect.forEach((filterEl) =>
-      window.util.setNodeDisable(filterEl)
-    );
-    window.util.setNodeDisable(getElement.mapFeatures);
+    $adFormGroups.forEach((groupEl) => Import.setNodeDisable(groupEl));
+    $mapFiltersSelects.forEach((filterEl) => Import.setNodeDisable(filterEl));
+    Import.setNodeDisable($mapFeatures);
   };
 
   const activateAllForms = () => {
-    getElement.allAdFormGroup.forEach((groupEl) =>
-      window.util.setNodeEnable(groupEl)
-    );
-    getElement.allMapFiltersSelect.forEach((filterEl) =>
-      window.util.setNodeEnable(filterEl)
-    );
-    window.util.setNodeEnable(getElement.mapFeatures);
-    getElement.adForm.classList.remove(Element.adForm.DISABLED);
+    $adFormGroups.forEach((groupEl) => Import.setNodeEnable(groupEl));
+    $mapFiltersSelects.forEach((filterEl) => Import.setNodeEnable(filterEl));
+    Import.setNodeEnable($mapFeatures);
+    $adForm.classList.remove(Classname.AD_FORM_DISABLED);
   };
 
   const startProgram = () => {
-    const activateMap = () => {
-      getElement.map.classList.remove(Element.map.FADED);
-    };
+    const activateMap = () => $map.classList.remove(Classname.MAP_FADED);
 
     const successHandler = (offers) => {
       offers.forEach((offer, index) => {
         offer.id = index;
       });
       window.map = {offers};
-      window.pin.addNewPins({offers});
+      Import.addNewPins({offers});
       activateAllForms();
     };
 
     const errorHandler = (errorMessage) => {
-      const errorTemplate = document
-        .querySelector(`#error`)
-        .content.cloneNode(true);
-
-      const main = document.querySelector(`main`);
-      document.body.insertBefore(errorTemplate, main);
+      document.body.insertBefore($errorTemplate.content.cloneNode(true), $main);
     };
 
     activateMap();
-    window.backend.load(successHandler, errorHandler);
+    Import.load(successHandler, errorHandler);
   };
 
   // 8.map-pin--main
@@ -114,7 +82,7 @@
       y: evt.clientY,
     };
 
-    const onMapPinMousemoveHandler = (moveEvt) => {
+    const handlerPinMousemove = (moveEvt) => {
       const shift = {
         x: startCoords.x - moveEvt.clientX,
         y: startCoords.y - moveEvt.clientY,
@@ -125,57 +93,35 @@
     };
 
     const removeMapPinHandlers = () => {
-      document.removeEventListener(`mousemove`, onMapPinMousemoveHandler);
-      document.removeEventListener(`mouseup`, onMapPinMouseupHandler);
+      document.removeEventListener(`mousemove`, handlerPinMousemove);
+      document.removeEventListener(`mouseup`, handlerPinMouseup);
     };
 
-    const onMapPinMouseupHandler = () => {
-      window.form.startProgram();
+    const handlerPinMouseup = () => {
+      startProgram();
       removeMapPinHandlers();
     };
 
-    document.addEventListener(`mousemove`, onMapPinMousemoveHandler);
-    document.addEventListener(`mouseup`, onMapPinMouseupHandler);
+    document.addEventListener(`mousemove`, handlerPinMousemove);
+    document.addEventListener(`mouseup`, handlerPinMouseup);
   };
 
-  getElement.mapPinMain.addEventListener(
-      `mousedown`,
-      handlerPinMousedown,
-      {
-        once: true,
-      }
-  );
+  $mapPinMain.addEventListener(`mousedown`, handlerPinMousedown, {once: true});
+
   // 9.fill address
-  getElement.addressInput.value = `${getElement.map.offsetWidth / 2}, ${
-    getElement.map.offsetHeight / 2
+  $adFormAddressInput.value = `${$map.offsetWidth / 2}, ${
+    $map.offsetHeight / 2
   }`;
 
-  getElement.adForm.addEventListener(`submit`, (evt) => {
+  $adForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
 
     const errorHandler = (errorMessage) => {
-      const errorTemplate = document
-        .querySelector(`#error`)
-        .content.cloneNode(true);
-
-      const main = document.querySelector(`main`);
-      document.body.insertBefore(errorTemplate, main);
+      document.body.insertBefore($errorTemplate.content.cloneNode(true), $main);
     };
 
-    window.backend.upload(
-        new FormData(getElement.adForm),
-        (response) => {
-          response;
-        },
-        errorHandler
-    );
+    Import.upload(new FormData($adForm), (response) => response, errorHandler);
   });
 
   disableAllForms();
-
-  window.form = {
-    mapContainerElement: getElement.map,
-    mapFiltersElement: getElement.mapFiltersContainer,
-    startProgram,
-  };
 })();
